@@ -25,18 +25,22 @@
 # ----------------------------------------------------------------------------------------
 
 #VERSION NUMBER
-export version=0.2.197
+export version=0.2.200
 
-#COLOR OUTPUT FOR RICH OUTPUT 
-ORANGE=$'\e[1;33m'
-RED=$'\e[1;31m'
-NC=$'\e[0m'
-GREEN=$'\e[1;32m'
-PURPLE=$'\e[1;35m'
-BLUE=$'\e[1;34m'
-CYAN=$'\e[1;36m'
-YELLOW=$'\e[01;33m'
-REPEAT=$'\e[1A'
+if [ -z ${NO_COLOR} -o -z ${NOCOLOR} ] ; then
+	#COLOR OUTPUT FOR RICH OUTPUT
+	ORANGE=$'\e[1;33m'
+	RED=$'\e[1;31m'
+	NC=$'\e[0m'
+	GREEN=$'\e[1;32m'
+	PURPLE=$'\e[1;35m'
+	BLUE=$'\e[1;34m'
+	CYAN=$'\e[1;36m'
+	YELLOW=$'\e[01;33m'
+	REPEAT=$'\e[1A'
+else
+	:
+fi
 
 # ----------------------------------------------------------------------------------------
 # BETA WARNING ONLY IF ON THE BETA CHANNEL
@@ -1100,7 +1104,9 @@ while true; do
 					publish_presence_message  \
 					"id=$addr" \
 					"confidence=$device_state" \
+					"name=${known_public_device_name[$addr]}" \
 					"type=KNOWN_MAC"
+
 				done
 				
 			elif [[ $mqtt_topic_branch =~ .*ADD\ STATIC\ DEVICE.* ]] || [[ $mqtt_topic_branch =~ .*DELETE\ STATIC\ DEVICE.* ]]; then 
@@ -1203,7 +1209,7 @@ while true; do
 				#exit
 				exit 0	
 
-			elif [[ $mqtt_topic_branch =~ .*ECHO.* ]]; then 
+			elif [[ $mqtt_topic_branch =~ .*ECHO.* ]] && [[ -z "$data_of_instruction" ]]; then 
 				$PREF_VERBOSE_LOGGING && log "${GREEN}[CMD-INST]	${NC}[${GREEN}pass mqtt${NC}] echo  ${NC}"				
 				
 				mqtt_echo

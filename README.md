@@ -21,7 +21,7 @@
 
 2. Download etcher from [etcher.io](https://etcher.io)
 
-3. Image **raspbian lite stretch** to SD card. [Instructions here.](https://www.raspberrypi.org/magpi/pi-sd-etcher/)
+3. Image **raspbian lite buster** to SD card. [Instructions here.](https://www.raspberrypi.org/magpi/pi-sd-etcher/)
 
 4. Mount **boot** partition of imaged SD card (unplug it and plug it back in)
 
@@ -87,7 +87,7 @@ sudo apt-key add mosquitto-repo.gpg.key
 
 #download appropriate lists file 
 cd /etc/apt/sources.list.d/
-sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
+sudo wget http://repo.mosquitto.org/debian/mosquitto-buster.list
 
 #update caches and install 
 apt-cache search mosquitto
@@ -236,7 +236,7 @@ Yes! A smarter approach is to wait for an anonymous sound, *then* start asking w
 
 This way, you're not constantly asking the room for all of your friends. Efficient!
 
-This technique is a very simplified description of how `montior` works for devices like cell phones (friends on a list) and beacons (announce a name out loud). This also gives an idea of how `monitor` uses anonymous sounds to reduce the number of times that it has to send inquiries into the Bluetooth environment. 
+This technique is a very simplified description of how `monitor` works for devices like cell phones (friends on a list) and beacons (announce a name out loud). This also gives an idea of how `monitor` uses anonymous sounds to reduce the number of times that it has to send inquiries into the Bluetooth environment. 
 
 ___
 
@@ -372,7 +372,6 @@ As an example:
 
 ```
 - alias: Occupancy On
-  hide_entity: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.home_occupancy_confidence
@@ -383,7 +382,6 @@ As an example:
         entity_id: input_boolean.occupancy
 
 - alias: Occupancy Off
-  hide_entity: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.home_occupancy_confidence
@@ -400,7 +398,6 @@ As an example:
 
 ```
 - alias: Andrew Occupancy On
-  hide_entity: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.andrew_occupancy_confidence
@@ -413,7 +410,6 @@ As an example:
         source_type: bluetooth
 
 - alias: Andrew Occupancy Off
-  hide_entity: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.andrew_occupancy_confidence
@@ -428,6 +424,10 @@ As an example:
 ```
 
 For more information, see [here](https://community.home-assistant.io/t/device-tracker-from-script/97295/7) and [here](https://github.com/andrewjfreyer/monitor/issues/138).
+
+If you only have one node, an [add-on](https://github.com/Limych/hassio-addons) by @limych may be an excellent choice for you!
+
+If having several nodes and lots of users, there is an AppDaemon App that can easily manage the integration of of this system into Home Assistant automatically for you by @Odianosen25. More information can be found [here](https://github.com/Odianosen25/Monitor-App)
 
 </details>
 
@@ -511,9 +511,9 @@ PREF_DEVICE_TRACKER_REPORT|false|If true, this value will cause `monitor` to rep
 PREF_DEVICE_TRACKER_HOME_STRING|home|If `PREF_DEVICE_TRACKER_REPORT` is true, this is the string that is reported to the device_tracker when the device is home.
 PREF_DEVICE_TRACKER_AWAY_STRING|not_home|If `PREF_DEVICE_TRACKER_REPORT` is true, this is the string that is reported to the device_tracker when the device is not home.
 PREF_DEVICE_TRACKER_TOPIC_BRANCH|device_tracker|If `PREF_DEVICE_TRACKER_REPORT` is true, this is last path element of the mqtt topic path that will be used to publish the device tracker message.
-PREF_ADVERTISEMENT_OBSERVED_INTERVAL_STEP|This is the minimum interval used to estimate advertisement intervals reported in the MQTT message. Default is 15 seconds.
-PREF_DEPART_SCAN_INTERVAL|If using periodic scanning mode, this is the minimum interval at which depart scans are triggered automatically. 
-PREF_ARRIVE_SCAN_INTERVAL|If using periodic scanning mode, this is the minimum interval at which arrive scans are triggered automatically. 
+PREF_ADVERTISEMENT_OBSERVED_INTERVAL_STEP|15|This is the minimum interval (in seconds) used to estimate advertisement intervals reported in the MQTT message.
+PREF_DEPART_SCAN_INTERVAL|30|If using periodic scanning mode, this is the minimum interval (in seconds) at which depart scans are triggered automatically. 
+PREF_ARRIVE_SCAN_INTERVAL|15|If using periodic scanning mode, this is the minimum interval (in seconds) at which arrive scans are triggered automatically. 
 
 
 ## RSSI Tracking
@@ -540,6 +540,10 @@ message: -99 through 0
 ```
 
 If an rssi measurement cannot be obtained, the value of -99 is sent. 
+
+## Report known states
+
+It is also possible tell monitor to report all currently known device states by sending an MQTT message to something like `monitor/first floor/KNOWN DEVICE STATES`. monitor.sh will then iterate over all known static addresses and report the current confidence level. This may be useful in home assistant to get the current state after a home assistant restart.
 
 </details>
 
